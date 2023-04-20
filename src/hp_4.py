@@ -52,11 +52,12 @@ def fees_report(infile, outfile):
             date_due = datetime.strptime(row['date_due'], '%m/%d/%Y')
             date_returned = datetime.strptime(row['date_returned'], '%m/%d/%Y')
             
-            days_late = (date_returned - date_due).days
-            if days_late > 0:
-                late_fee = days_late * 0.25
+            if date_returned >= date_due:
+                days_late = (date_returned - date_due).days
+                if days_late > 0:
+                    late_fee = days_late * 0.25
                 
-                late_fees_by_patron[row['patron_id']] += late_fee
+                    late_fees_by_patron[row['patron_id']] += late_fee
 
     with open(outfile, 'w', newline='') as f:
         writer = DictWriter(f, fieldnames=['patron_id', 'late_fees'])
