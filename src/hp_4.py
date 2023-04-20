@@ -70,7 +70,7 @@ def fees_report(infile, outfile):
         writer.writeheader()
 
         for patron_id in sorted(late_fees_by_patron):
-            writer.writerow({'patron_id': patron_id, 'late_fees': ' {:.2f}'.format(late_fees_by_patron[patron_id])})
+            writer.writerow({'patron_id': patron_id, 'late_fees': '{:.2f}'.format(late_fees_by_patron[patron_id])})
 
 
 # The following main selection block will only run when you choose
