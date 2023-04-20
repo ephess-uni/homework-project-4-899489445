@@ -43,28 +43,34 @@ def add_date_range(values, start_date):
 def fees_report(infile, outfile):
     """Calculates late fees per patron id and writes a summary report to
     outfile."""
-    late_fees_by_patron = defaultdict(float)
+    late_fees_by_patron = {}
 
     with open(infile, 'r') as f:
         reader = DictReader(f)
-        
+
         for row in reader:
             date_due = datetime.strptime(row['date_due'], '%m/%d/%Y')
             date_returned = datetime.strptime(row['date_returned'], '%m/%d/%Y')
-            
+
             if date_returned >= date_due:
                 days_late = (date_returned - date_due).days
                 if days_late > 0:
                     late_fee = days_late * 0.25
-                
+
+                    if row['patron_id'] not in late_fees_by_patron:
+                        late_fees_by_patron[row['patron_id']] = 0.00
+
                     late_fees_by_patron[row['patron_id']] += late_fee
+            else:
+                if row['patron_id'] not in late_fees_by_patron:
+                    late_fees_by_patron[row['patron_id']] = 0.00
 
     with open(outfile, 'w', newline='') as f:
         writer = DictWriter(f, fieldnames=['patron_id', 'late_fees'])
         writer.writeheader()
-        
-        for patron_id, late_fees in late_fees_by_patron.items():
-            writer.writerow({'patron_id': patron_id, 'late_fees': '{:.2f}'.format(late_fees)})
+
+        for patron_id in sorted(late_fees_by_patron):
+            writer.writerow({'patron_id': patron_id, 'late_fees': ' {:.2f}'.format(late_fees_by_patron[patron_id])})
 
 
 # The following main selection block will only run when you choose
